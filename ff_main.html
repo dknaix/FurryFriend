@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<title>Furry Friend</title>
+		<link rel="stylesheet" href="ff.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript" src="ff.js"></script>
+		<script type="text/javascript">
+
+			$(document).ready(function(){
+					console.log("JQ ready")
+
+					use_ev_listner=false
+
+					document.getElementById('iframe0').onload = function() {
+						if (use_ev_listner==true) {
+							// alert('Using Ev listner Resize');
+							// alert("Pet shop scrool height:"+document.body.scrollHeight)
+							let temp2=document.body.scrollHeight-500
+							temp2=temp2+"px"
+							// alert("Setting height to "+temp2)
+							$("#iframe0").height(temp2)
+							use_ev_listner=false
+						}
+					};
+
+			})
+
+			dynamic_iframe_resize=()=>{}
+
+			function page_switch(page=""){
+				// alert("Frame switch called")
+				$(".footer_main").show(50)
+				if (page=="home") {
+					$("#iframe0").attr("src","ff_home.html")
+					$("#iframe0").height("1170px")
+				}
+				else if (page=="donation") {
+					$("#iframe0").attr("src","donation.html")
+					$("#iframe0").height("650px")
+				}
+				else if (page=="contact_us") {
+					$("#iframe0").attr("src","contact_us.html")
+					$("#iframe0").height("650px")
+				}
+				else if (page=="volunteer") {
+					$("#iframe0").attr("src","volunteer.html")
+					$("#iframe0").height("650px")
+				}
+				else if (page=="about_us") {
+					$("#iframe0").attr("src","about_us.html")
+					$("#iframe0").height("900px")
+				}
+				else if (page=="adoption") {
+					$("#iframe0").attr("src","adoption.html")
+					$("#iframe0").height("1192px")
+				}
+				else if (page=="pet_shop") {
+					use_ev_listner=true
+					$("#iframe0").attr("src","pet_shop.html")
+					// alert("Pet shop scrool height:"+document.body.scrollHeight)
+
+					// $("#iframe0").height("1250px")
+					$(".footer_main").hide(100)
+
+				}
+
+				else {alert("Critical err:Src null")}
+			}
+
+		</script>
+	</head>
+
+	<body onload="check_cookie_preset()">
+		<div class="main_body_container">
+			<div class="header_main">
+				<div class="header_main_text">
+					<label id="header_main_text_sup">Furry Friend NGO</label>
+					<label id="header_main_text_sub">A Paw in Need</label>
+				</div>
+				<div class="header_main_navbar">
+					<label id="" onclick="page_switch('home')">Home |</label>
+					<label id="" onclick="page_switch('about_us')">What do we do? |</label>
+					<label id="" onclick="page_switch('adoption')">Adoption |</label>
+					<label id="" onclick="page_switch('pet_shop')">Pet Shop |</label>
+					<label id="" onclick="page_switch('volunteer')">Volunteer |</label>
+					<label id="" onclick="page_switch('donation')">Donate |</label>
+					<label id="" onclick="page_switch('contact_us')">Contact Us </label>
+				</div>
+				<div class="header_main_navbar2">
+					+91 987654321 mailfurryfirned@ff.com
+					<button id="logout_btn_main" onclick="logout()">Logout</button>
+				</div>
+			</div>
+
+			<!-- change height acc to page req -->
+			<iframe id="iframe0" name="iframe0" src="ff_home.html"></iframe>
+
+			<div class="footer_main">
+				<div class="header_main_navbar_footer">
+					<label id="" onclick="page_switch('about_us')">About Us |</label>
+					<label id="" onclick="page_switch('donation')">Donate for a cause |</label>
+					<label id="" onclick="page_switch('adoption')">Adopt a friend |</label>
+					<label id="" onclick="page_switch('pet_shop')">Pet Shop </label>
+
+				</div>
+				<div class="header_main_navbar2_footer">
+					+91 987654321 mail@furryfirned@ff.com
+				</div>
+				<br>@2020 All Righs Reserved
+			</div>
+
+
+		</div>
+
+	</body>
+</html>

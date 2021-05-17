@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="ff.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+
+		$(document).ready(function(){
+				console.log("JQ ready")
+				global_cart=[]
+				global_counter=0 //for slider
+				$(".shop_head > .shop_head_slideshow:first-child").show()
+
+
+
+				// $(document).ajaxComplete(function(){
+    		// 	console.log("Ajax complete")
+  			// });
+
+			}
+		)
+
+		check_cookie_preset=()=>{//ajax chk
+			// alert("cookie_prechk_called")
+			$.post("validate.php",{check:"123"},
+			function(data, status){
+				if (data=="already_set"){
+					// alert("prechk Set!!! data:"+data)
+					fetch_item_catg('Dog')
+					}
+				else{
+					// alert("prechk not_set data:"+data)
+					$(".shop_container").css("filter","blur(10px)")
+					$(".adoption_blur_login").show()
+					}
+				}
+			);
+		}
+
+		function fetch_creds(type){
+			let login=$("#login_uname").val()
+			let pass=$("#login_password").val()
+			$("#login_uname").val("") //clear val
+			$("#login_password").val("")
+			// alert("Creds rcv:"+login+pass+type)
+			login_fn(login,pass,type)
+		}
+
+		function login_fn(login,pass,type){
+			// alert("Rcv type:"+type)
+			$.post("validate.php",{login:login,pass:pass,type:type},
+			function(data, status){
+				// alert("Data"+data+" Status:"+status)
+
+				if(data=="login_success" && type=="login"){
+					alert("Login success")
+					$(".adoption_blur_login").fadeOut(300)
+					$(".shop_container").css("filter","blur(0px)")
+					parent.check_cookie_preset()
+					fetch_item_catg('Dog') //first time fetch data aftr login
+				}
+
+				else if(data=="login_fail" && type=="login"){
+					alert("Login fail")
+					$("#hidden_err_msg").fadeIn(50)
+					return data
+				}
+
+				else if(data=="new_acc_success" && type=="new"){
+					alert("new acc sucessfull,redirecting..")
+					$(".adoption_blur_login").fadeOut(150)
+					$(".shop_container").css("filter","blur(0px)")
+					parent.check_cookie_preset()
+					fetch_item_catg('Dog') //first time fetch data aftr login
+				}
+
+				else if(data=="err_creating_acc" && type=="new"){
+					alert("err_creating_acc")
+				}//not
+
+				else{alert("Unknown err data="+data)}
+			});
+		}
+
+
+		change_slide=(pos)=>{
+			$(".shop_head > .shop_head_slideshow").fadeOut(5)
+			// alert("showing next")
+			if (global_counter>=2 || global_counter<=-2) {
+				// alert("Caught "+global_counter)
+				global_counter=0
+				console.log("ouch")
+				$(".shop_head > .shop_head_slideshow").eq(global_counter).fadeIn(500)
+			}
+			else if (pos=="next") {
+				global_counter+=1
+				$(".shop_head > .shop_head_slideshow").eq(global_counter).fadeIn(500)
+			}
+			else {
+				global_counter-=1
+				$(".shop_head > .shop_head_slideshow").eq(global_counter).fadeIn(500)
+			}
+		}
+
+
+		login_switch=()=>{
+			// $(".shop_container").css("filter","blur(10px)") //send this line to login caller, not css switch
+
+			$("#login_text_0").fadeOut(10)
+			$("#login_text_1").fadeOut(10)
+			$("#login_text_2").fadeOut(10)
+			$("#login_btn").fadeOut(10)
+
+			$("#login_text_0").delay(150).text("We are Pleased to have a new Friend!")
+			$("#login_text_1").delay(150).text("Create New Username")
+			$("#login_text_2").delay(150).text("New Password")
+			$("#login_btn").delay(150).hide()
+			$("#login_text_3").delay(150).html("Join Us and become a part of the Community <br>Exited to meet you!")
+
+
+			$("#login_text_0").fadeIn()
+			$("#login_text_1").fadeIn()
+			$("#login_text_2").fadeIn()
+			$("#create_btn").fadeIn()
+
+		}
+
+
+		fetch_item_catg=(cat="")=>{
+			bill_reset()
+			$(".item").remove()
+			$(".remove_product_form_list").remove()
+			$(".cart_div").fadeOut(500)
+			if (cat=="") {alert("ERR:No arg passed @fetch_item_catg")}
+			$.post("validate.php",{get_client_item_list:cat},
+			function(data, status){
+				data=data.split("--")
+				//alert(data)
+				// alert("Len of data:"+data.length)
+				let no_of_item=data.length/6
+				if (data.length<=1) {return} //alert("Empty List");
+				for (var i = 0; i < no_of_item; i++) {
+					let a=data[0+(6*i)]
+					let b=data[1+(6*i)]
+					let c=data[2+(6*i)]
+					let d=data[3+(6*i)]
+					let e=data[4+(6*i)]
+					let f=data[5+(6*i)]
+					client_item_injector(a,b,c,d,e,f)
+				}
+			}
+		);
+	}
+
+
+		client_item_injector=(a,b,c,d,e,f)=>{
+
+			// if (a==undefined || b==undefined ||c==undefined ||d==undefined ) {
+			// 	alert("Corrupted Entry")
+			// 	return
+			// } //dont list empty list
+
+			client_item_holder='<img id="cart_img" name="'+a+'" src="img/cart.png" onclick="add_to_cart(this.name)"></img><img class="item_img" id="'+a+'_'+a+'" src="'+f+'" ></img>'
+			client_item_holder=client_item_holder+''+b+'<br>₹<label id="price">'+c+'</label>.00'
+
+			y=$('<div class="item" id="'+a+'"></div>')
+			y.append(client_item_holder)
+			// alert("loc:"+loc)
+			$(".right_shop_display").append(y)
+		}
+
+
+		add_to_cart=(name)=>{
+			// alert("id:"+name)
+			let prod_name=$("#"+name).text()
+			let duplicate=false
+			prod_name=prod_name.split("₹")
+
+			if (global_cart.length>0) { //same item skip block
+				for (let i = 0; i < global_cart.length; i++) {
+					if (global_cart[i]==name) {duplicate=true} //alert("Same item caught skipping")
+				}
+				if (duplicate==false) {global_cart.push(name)} //alert("Pushed else1=>"+name);
+			}
+			else {global_cart.push(name)} //for first time push //alert("Pushed=>"+name);
+
+			// alert(global_cart+" its len is:"+global_cart.length)
+			$(".floating_notification").text("Item:"+prod_name[0]+" has beed added to the cart!!!")
+			$(".floating_notification").css({position:"absolute", top:event.pageY+20, left: event.pageX})
+			$(".floating_notification").fadeIn(1500)
+			$(".floating_notification").fadeOut(3000)
+
+		}
+
+		cart_display=()=>{
+			$(".remove_product_form_list").remove()
+			$(".item").remove()
+			$(".cart_div").fadeIn(1000)
+			for (var i = 0; i < global_cart.length; i++) {
+				// alert("Injector called, id="+global_cart[i])
+
+				$.post("validate.php",{get_client_item_list_cart:global_cart[i]},
+					function(data, status){
+						data=data.split("--")
+						//alert(data)
+						// alert("Len of data:"+data.length)
+						let no_of_item=data.length/6
+						if (data.length<=1) {alert("Empty List");return}
+						$("#buy_now_cart_btn").fadeIn(2000)
+						for (var i = 0; i < no_of_item; i++) {
+							let a=data[0+(6*i)]
+							let b=data[1+(6*i)]
+							let c=data[2+(6*i)]
+							let d=data[3+(6*i)]
+							let e=data[4+(6*i)]
+							let f=data[5+(6*i)]
+							cart_list_item_injector(a,b,c,d,e,f)
+						}
+					}
+				);
+
+			}
+
+		}
+
+		function cart_list_item_injector(a,b,c,d,e,f) {
+			//a=item_id
+			//b=name
+			//c=cost
+			//d=desc
+			//e=catg
+			//f=path
+			if (a==undefined || b==undefined ||c==undefined ||d==undefined ||e==undefined ) {
+				alert("Corrupted Entry")
+				return
+			} //dont list empty list
+			admin_list_holder='<table id="remove_product_form_list_table"><tr><td><img id="remove_product_form_list_img" src="'+f+'" ></td>'
+			admin_list_holder=admin_list_holder+'<td><label class="cart_item_name" >'+b+'</label><br><br><label class="cart_item_desc">'+d+'</label></td>'
+			admin_list_holder=admin_list_holder+'<td>Cost:'+c+'₹</td>'
+			admin_list_holder=admin_list_holder+'<td> <button name="'+a+'" class="incr_btn" onclick="incr(\'-\',this.name)">-</button><input class="item_count" id="'+a+'_item_count" type=number value="1" min=1 max=20 ></input><button name="'+a+'" class="incr_btn" onclick="incr(\'+\',this.name)">+</button>'
+			admin_list_holder=admin_list_holder+'<br><br><button name="'+a+'" class="delete_usercart_item_btn" onclick="delete_usercart_item(this.name,this)">Delete</button></td></tr></table>'
+
+			y=$('<div class="remove_product_form_list"></div>')
+			y.append(admin_list_holder)
+
+			$(".cart_div").append(y)
+		}
+
+		//incr decr item count from input
+		incr=(operation,id="")=>{
+			// alert("Operation: "+operation+" name:"+id)
+			let temp="#"+id+"_item_count"
+			if (operation=="+") {
+				$(temp).val( function(i, oldval) {if(oldval>=20){return 20};return ++oldval;});
+			}
+			else {
+				$(temp).val( function(i, oldval) {if(oldval<=1){return 1};return --oldval;});
+			}
+
+		}
+
+		generate_bill=()=>{
+			$.ajaxSetup({async:false}) //fix post-sync bug !DepriciationIgnore
+			global_itemXCount=[]
+			total=0 //global setting for callback-fn var scope access
+			// alert("generating bill")
+
+			for (var i = 0; i < global_cart.length; i++) {
+				let temp_count=$("#"+global_cart[i]+"_item_count").val()
+				global_itemXCount.push(global_cart[i]+"x"+temp_count)
+				// alert("Got List:"+global_cart[i]+" Count:"+temp_count)
+			}
+			// alert(global_itemXCount) //got final count
+
+			//splitting itemXCount
+			for (var i = 0; i < global_itemXCount.length; i++) {
+				qty=global_itemXCount[i].split("x")
+				// alert("Got Splits:"+qty[0]+" "+qty[1])
+				var temp0=qty[1]
+				$.post("validate.php",{get_client_item_list_cart:qty[0]},
+					function(data, status){
+						// alert("Qty now:"+qty)
+						data=data.split("--")
+						//alert(data)
+						// alert("Len of data:"+data.length)
+						let no_of_item=data.length/6
+						if (data.length<=1) {alert("Empty List");return}
+
+						for (var i = 0; i < no_of_item; i++) {
+							let b=data[1+(6*i)]
+							let c=data[2+(6*i)]
+							// alert("Sending "+b+" "+qty[1]+" "+c)
+							total=total+(qty[1]*c)
+
+							td_cart_injector(b,qty[1],c)
+						}
+					}
+				);
+				// alert("Loop cojmplete")
+				if (i==global_itemXCount.length-1) {
+					// alert("Last Iter Caught")
+					td_cart_injector("","",total)
+				}
+			}
+			$(".bill").fadeIn(1500)
+			$.ajaxSetup({async:true}) //to fix post-sync req's
+		}
+
+		wait=(ms)=> {
+			var start = Date.now(),
+		 	now = start;
+			while (now - start < ms) {
+				now = Date.now();
+			}
+		}
+
+
+		function td_cart_injector(a,b,c) {
+			//a=item_name
+			//b=qty
+			//c=cost
+			if (a==undefined || b==undefined ||c==undefined ) {
+				alert("Corrupted Entry");return} //dont list empty list
+
+			admin_list_holder='<td>'+a+'</td><td>'+b+'</td><td>'+c+'</td>'
+
+			y=$('<tr></tr>')
+			y.append(admin_list_holder)
+
+			$(".bill table").append(y)
+		}
+
+		post_order=()=>{
+			var item_string=""
+			for (var i = 0; i < global_itemXCount.length; i++) {
+				 item_string=item_string+global_itemXCount[i]+"^^"
+			}
+			var addr=$(".bill textarea").val()
+			// alert("Itm_str:"+item_string)
+			// alert("Total:"+total)
+			// alert("Address:"+addr)
+			$.post("validate.php",{post_order:item_string,total:total,address:addr},
+				function(data, status){
+					if (data=="new_order_success") {
+						alert("Order has been placed Sucessfully")
+						bill_reset()
+					}
+				}
+			);
+		}
+
+		bill_reset=()=>{
+			$(".bill td").remove()
+			$(".bill textarea").val("")
+			$(".bill").hide()
+		}
+
+		//remove data when deleted from cart
+		delete_usercart_item=(id_name,elem)=>{
+			// alert("Delete called name is:"+id_name)
+			// alert("Global cart before "+global_cart)
+			global_cart = global_cart.filter(function(item) {return item !== id_name})
+			// alert("Global cart After "+global_cart)
+
+			$(elem).parentsUntil(".cart_div").remove() //remove div
+			if (global_cart.length<=0) { //remove  bill button
+				$("#buy_now_cart_btn").fadeOut(1000)
+			}
+		}
+
+		</script>
+	</head>
+
+	<body onload="check_cookie_preset()">
+
+		<div class="floating_notification"></div>
+
+		<!-- Switch me  -->
+		<div class="adoption_blur_login">
+			<label id="login_text_0">Not Logged in Yet?</label>
+			<br><br> 			<label id="login_text_1">Login:</label>
+			<br> 					<input id="login_uname"></input>
+			<br><br> 			<label id="login_text_2">Password:</label>
+			<br> 					<input id="login_password" type="password"></input>
+										<br><label id="hidden_err_msg">Login or password incorrect*</label>
+			<br><br> 			<button id="login_btn" class="submit_btn_theme" onclick="fetch_creds('login')">Login</button>
+										<button id="create_btn" class="submit_btn_theme" onclick="fetch_creds('new')">Create</button>
+			<br><br><br>	<label id="login_text_3" onclick="login_switch()">Dont Have a Account?, Create now!</label>
+
+		</div>
+
+		<div class="shop_container">
+			<div class="shop_head">
+				<div class="shop_head_slideshow" ><img id="shop_head_slideshow_img" src="img/sale4.jpg" alt=""></div>
+				<div class="shop_head_slideshow" ><img id="shop_head_slideshow_img" src="img/sale_1.jpg" alt=""></div>
+				<div class="shop_head_slideshow" ><img id="shop_head_slideshow_img" src="img/sale_2.jpg" alt=""></div>
+				<a id="a_left"  onclick="change_slide('back')">&#10094;</a>
+  			<a id="a_right" onclick="change_slide('next')">&#10095;</a>
+
+			</div>
+
+			<div class="shop_body">
+				<div class="left_vertical_panel">
+					<div class="left_vertical_panel_0">Shop By Category</div>
+					<div class="left_vertical_panel_1" onclick="fetch_item_catg('Dog')">Dogs</div>
+					<div class="left_vertical_panel_2" onclick="fetch_item_catg('Cat')">Cats</div>
+					<div class="left_vertical_panel_3" onclick="fetch_item_catg('Fish')">Fish</div>
+					<div class="left_vertical_panel_4" onclick="fetch_item_catg('Bird')">Birds</div>
+					<div class="left_vertical_panel_5" onclick="fetch_item_catg('Extras')">Extras</div>
+					<div class="left_vertical_panel_6" onclick="cart_display()">My Cart</div>
+				</div>
+				<div class="right_shop_display">
+
+					<!-- <div class="item">
+						<img id="item_img" src="img/items/dogs/pedigree.jpg" ></img>
+						Pedigree Puppy Chicken and Milk 12KG
+						<br>₹<label id="price">799</label>.00
+					</div> -->
+					<div class="cart_div">
+						<label id="cart_div_text_1">My Cart</label>
+						<button id="buy_now_cart_btn" onclick="generate_bill()">Place Order</button>
+					</div>
+
+					<div class="bill">
+						<label id="bill_text_1">FurryFriend NGO</label>
+						<br><br>
+						<label id="bill_text_2">Invoice<br></label>
+						<table class="bill_table">
+							<tr>
+								<th>Item </th><th>Qty </th><th>Price </th>
+							</tr>
+							<!-- <tr><td>TestPedigree</td><td>2</td><td>500</td></tr> -->
+
+						</table>
+						<br><br>
+						<label id="bill_text_3">Enter Delivery Address:</label>
+						<br>
+						<textarea rows="5" cols="60" resize="none"></textarea>
+						<label>Orders are "Pay on Delivery" pay only when the product arrives at you home!!!</label>
+						<br><br><button onclick="post_order()">Place Order!</button>
+					</div>
+
+				</div>
+
+				<div class="pet_shop_footer">
+					<div class="header_main_navbar_footer">
+						<label id="" onclick="page_switch('about_us')">About Us |</label>
+						<label id="" onclick="page_switch('donation')">Donate for a cause |</label>
+						<label id="" onclick="page_switch('adoption')">Adopt a friend |</label>
+						<label id="" onclick="page_switch('pet_shop')">Pet Shop </label>
+
+					</div>
+					<div class="header_main_navbar2_footer">
+						+91 987654321 mail_furryfriend@ff.com
+					</div>
+					@2020 All Righs Reserved
+				</div>
+
+			</div>
+		</div>
+	</body>
+</html>

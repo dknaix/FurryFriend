@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="ff.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript" src="ff.js"></script>
+		<script type="text/javascript">
+
+			function iniFrame() {
+		    if ( window.location !== window.parent.location )
+		    {
+		        // The page is in an iFrames
+		        document.write("The page is in an iFrame");
+		    }
+		    else {
+		        // The page is not in an iFrame
+		        document.write("The page is not in an iFrame");
+		    }
+			}
+
+			fetch_volunteer= () => {
+				let a=$("#volunteer_ip_1").val()
+				let b=$("#volunteer_ip_2").val()
+				let c=$("#volunteer_ip_3").val()
+				$.post("validate.php",{volunteer_ip_1:a, volunteer_ip_2:b, volunteer_ip_3:c},
+					function(data, status){
+						alert(data)
+					}
+				);
+			}
+
+		</script>
+	</head>
+	<body>
+		<div class="volunteer_conatiner">
+			<label id="volunteer_conatiner">Become A Volunteer<br>Join the Squad!</label>
+			<br><br>
+			Name
+			<br><input id="volunteer_ip_1"></input>
+			<br><br>Email Id
+			<br><input id="volunteer_ip_2"></input>
+			<br><br>Contact no
+			<br><input id="volunteer_ip_3" type="number" maxlength="12" ></input>
+			<br><br>
+			<button onclick="fetch_volunteer()" class="submit_btn_theme">Submit Info</button>
+		</div>
+
+	</body>
+</html>

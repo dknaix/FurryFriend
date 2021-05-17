@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<title>FF-Ngo Admin</title>
+		<link rel="stylesheet" href="ff_admin.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript" src="ff.js"></script>
+		<script type="text/javascript">
+
+			$(document).ready(function() {
+
+				console.log("Hello Bitches")
+
+			});
+
+			admin_pg_switch = (page) => {
+					// alert("called "+page)
+					if (page=="order") {
+						$(".orders_body").show()
+						$(".volunteer_body").hide()
+						$(".contact_body").hide()
+						$(".product_body").hide()
+						$(".remove_product_form_list").remove()
+						get_admin_item_list(order=true)
+					}
+					else if (page=="volunteer") {
+						$(".orders_body").hide()
+						$(".volunteer_body").show()
+						$(".contact_body").hide()
+						$(".product_body").hide()
+						get_common_data("volunteer")
+						$(".common_list").remove()
+
+
+					}
+					else if (page=="contact") {
+						$(".orders_body").hide()
+						$(".volunteer_body").hide()
+						$(".contact_body").show()
+						$(".product_body").hide()
+						get_common_data("contact_us")
+						$(".common_list").remove()
+
+					}
+					else if (page=="product") {
+						$(".orders_body").hide()
+						$(".volunteer_body").hide()
+						$(".contact_body").hide()
+						$(".product_body").show()
+					}
+			}
+
+			admin_div_switch = (page) => {
+					// alert("called "+page)
+					if (page=="add_product") {
+						$(".add_product_form").show()
+						$(".remove_product_form").hide()
+
+
+					}
+					else if (page=="remove_product") {
+						$(".add_product_form").hide()
+						$(".remove_product_form").show()
+						$(".remove_product_form_list").remove()
+						get_admin_item_list()
+					}
+
+			}
+
+			get_admin_item_list=(order=false)=>{
+				var x="123"
+				var variable_divisior=6
+				if (order==true) {
+					// alert("Got Orders req")
+					x="order"
+					variable_divisior=5
+				}
+				$.post("validate.php",{get_admin_item_list:x},
+					function(data, status){
+						data=data.split("--")
+						//alert(data)
+						// alert("Len of data:"+data.length)
+						let no_of_item=data.length/variable_divisior
+						if (data.length<=1) {alert("Empty List");return}
+						for (var i = 0; i < no_of_item; i++) {
+							let a=data[0+(variable_divisior*i)]
+							let b=data[1+(variable_divisior*i)]
+							let c=data[2+(variable_divisior*i)]
+							let d=data[3+(variable_divisior*i)]
+							let e=data[4+(variable_divisior*i)]
+							if (variable_divisior==5) {admin_order_list_injector(a,b,c,d,e)}
+							else {
+								let f=data[5+(6*i)]
+
+								admin_item_list_injector(a,b,c,d,e,f)
+							}
+						}
+					}
+				);
+			}
+
+			function admin_item_list_injector(a,b,c,d,e,f) {
+				//a=item_id
+				//b=name
+				//c=cost
+				//d=desc
+				//e=catg
+				//f=path
+				// if (a==undefined || b==undefined ||c==undefined ||d==undefined ||e==undefined ) {
+				// 	alert("Corrupted Entry")
+				// 	return
+				// } //dont list empty list
+				admin_list_holder='<table id="remove_product_form_list_table"><tr><td><img id="remove_product_form_list_img" src="'+f+'" ></td>'
+				admin_list_holder=admin_list_holder+'<td>'+b+'</td><td>Catagory:'+e+'</td>'
+				admin_list_holder=admin_list_holder+'<td>Cost:'+c+'₹</td><td>'+d+'</td>'
+				admin_list_holder=admin_list_holder+'<td><button name="'+a+'" id="" onclick="delete_admin_item.call(this)">Delete</button></td></tr></table>'
+
+				y=$('<div class="remove_product_form_list"></div>')
+				y.append(admin_list_holder)
+
+				$(".remove_product_form").append(y)
+			}
+
+			function admin_order_list_injector(a,b,c,d,e) {
+				//a=datetime
+				//b=uname
+				//c=item_X_count
+				//d=address
+				//e=total
+
+				if (a==undefined || b==undefined ||c==undefined ||d==undefined ||e==undefined ) {
+					alert("Corrupted Entry")
+					return
+				} //dont list empty list
+				admin_list_holder='<table id="remove_product_form_list_table"><tr><td>'+a+'</td>'
+				admin_list_holder=admin_list_holder+'<td>'+b+'</td><td>Addr:'+d+'</td>'
+				admin_list_holder=admin_list_holder+'<td>'+c+'</td><td>'+e+'₹</td>'
+				// admin_list_holder=admin_list_holder+'<td><button name="'+a+'" id="" onclick="delete_admin_item(this)">Delete</button></td></tr></table>'
+
+				y=$('<div class="remove_product_form_list"></div>')
+				y.append(admin_list_holder)
+
+				$(".order_list_here").append(y)
+			}
+
+			function delete_admin_item(){
+				let id=$(this).attr("name")
+				// alert("Deleting:"+id)
+				$.post("validate.php",{delete_admin_item:id},
+					function(data, status){
+						// alert(data)
+
+					}
+				);
+				admin_div_switch('remove_product') //refresh pg after delete
+			}
+
+
+
+			function get_common_data(loc=""){
+				//alert("get_common_data called loc="+loc)
+				if (loc=="") {alert("ERR:No arg passed @ get_common_data");return}
+
+				if (loc=="contact_us") {var post_name="get_admin_contact_list"}
+				else if (loc=="volunteer") {var post_name="get_admin_volunteer_list"}
+				else {alert("ERR:Invalid arg passed @ get_common_data");return}
+				//computed property names eg.  key0='a'  [key0]:'10' ie a:10
+				$.post("validate.php",{ [post_name] :"123"},
+					function(data, status){
+						// alert(data)
+						data=data.split("--")
+						//alert("Len of data:"+data.length)
+						// alert("Last elem is:"+data[data.length-1])
+						let loc=data[data.length-1]
+						data.pop()
+						let no_of_item=data.length/4
+						if (data.length<=1) {alert("Empty List");return}
+						for (var i = 0; i < no_of_item; i++) {
+							let a=data[0+(4*i)]
+							let b=data[1+(4*i)]
+							let c=data[2+(4*i)]
+							let d=data[3+(4*i)]
+							common_list_injector(loc,a,b,c,d)
+						}
+					}
+				);
+			}
+
+
+			function common_list_injector(loc="",a,b,c,d) {
+
+				if (a==undefined || b==undefined ||c==undefined ||d==undefined ) {
+					alert("Corrupted Entry")
+					return
+				} //dont list empty list
+
+				common_list_holder='<table><tr><td>'+a+'</td><td>'+b+'</td><td>'+c+'</td>'
+				common_list_holder=common_list_holder+'<td>'+d+'</td></tr></table></div>'
+				y=$('<div class="common_list"></div>')
+				y.append(common_list_holder)
+				// alert("loc:"+loc)
+				if (loc=="contact_us_gg") { $(".contact_body").append(y) }
+				else if (loc=="volunteer_gg") { $(".volunteer_body").append(y) }
+				else {alert("ERR:No arg passed in Common list")}
+			}
+
+
+
+		</script>
+	</head>
+	<body onload="admin_pg_switch('order')">
+
+		<div class="header_main_text">
+			<label id="header_main_text_sup">Furry Friend Admin Panel</label>
+			<label id="header_main_text_sub">A Paw in Need</label>
+		</div>
+		<div class="admin_body">
+
+			<div class="admin_left_vertical_panel">
+				<div class="admin_left_vertical_panel_1" onclick="admin_pg_switch('order')">Orders</div>
+				<div class="admin_left_vertical_panel_2" onclick="admin_pg_switch('volunteer')">Volunteer List</div>
+				<div class="admin_left_vertical_panel_3" onclick="admin_pg_switch('contact')">New Client Messages</div>
+				<div class="admin_left_vertical_panel_4" onclick="admin_pg_switch('product')">Add/Remove Products</div>
+			</div>
+
+			<div class="orders_body">
+				<label >Orders List</label>
+				<div class="order_list_here"></div>
+			</div>
+
+			<div class="volunteer_body">
+				volunteer body
+			</div>
+
+			<div class="contact_body">
+				contact body
+
+				<div class="common_list">
+					<table>
+						<tr>
+							<td>2020-10-15 1515156.541</td>
+							<td>NAMEnub</td>
+							<td>namenub@asdsd.com</td>
+							<td>trashy websiyte shut down uiahdashd hasdulha</td>
+						</tr>
+					</table>
+				</div>
+
+
+			</div>
+
+			<div class="product_body">
+				<button class="product_switch_btn" onclick="admin_div_switch('add_product')">Add Products</button>
+				<button class="product_switch_btn" onclick="admin_div_switch('remove_product')">Remove Products</button>
+
+				<div class="add_product_form">
+
+					<form id="add_product_form_0" action="validate.php" method="post" enctype="multipart/form-data">
+						<br>Product Name:
+						<br><input id="product_body_ip_1" name="p_name"></input>
+						<br><br>Select Catagory:
+						<br><select id="product_body_ip_2" name="p_cat">
+							<option>Dog</option>
+							<option>Cat</option>
+							<option>Fish</option>
+							<option>Bird</option>
+							<option>Extras</option>
+						</select>
+						<br><br>Product Cost in ₹:
+						<br><input id="product_body_ip_3" type="number" name="p_cost"></input>
+						<br><br>Product Description:
+						<br><textarea id="product_body_ip_4" cols="40" rows="4" maxlength="80" name="p_desc"></textarea>
+						<br><br>Upload Image:
+						<br><input id="product_body_ip_5" type="file" accept=".jpg,.jpeg,.png,.webp,.svg" name="p_img"></input>
+						<br><br><button onclick="add_item()">Submit</button>
+					</form>
+				</div>
+
+				<div class="remove_product_form">
+					Remove Product
+
+					<!-- <div class="remove_product_form_list">
+						<table id="remove_product_form_list_table">
+							<tr>
+								<td><img id="remove_product_form_list_img" src="img/items/dogs/pedigree.jpg" ></td>
+								<td>Pedigree White 7kg</td>
+								<td>Catagory:Dog</td>
+								<td>Cost:500₹</td>
+								<td>Very Good Product for dogsd	</td>
+								<td><button id="">Delete</button></td>
+							</tr>
+						</table>
+					</div> -->
+
+
+				</div>
+
+			</div>
+
+		</div>
+	</body>
+</html>

@@ -1,0 +1,159 @@
+*{
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333331;
+	outline: none;
+}
+
+body{margin: 0;margin-right:5px;}
+
+#header_main_text_sup{font-size: 55px;color: #FFFFFF !important;}
+#header_main_text_sub{font-size: 18px;color: #FFFFFF !important;}
+.header_main_text{
+	padding-left:5px;
+	padding-top:15px;
+	width:100%;
+	height:59%;
+
+	background: rgb(78,230,251);
+	background: linear-gradient(90deg, rgba(78,230,251,1) 0%, rgba(217,255,13,1) 100%);
+}
+
+
+.header_main_text{
+	height:100px;
+	width: 100%;
+}
+
+.admin_body{
+	float: right;
+	height:550px;
+	width: 100%;
+}
+
+.admin_left_vertical_panel{
+	float: left;
+	height:inherit;
+	width: 23%;
+	margin-left:5px;
+}
+
+.admin_left_vertical_panel_1,
+.admin_left_vertical_panel_2,
+.admin_left_vertical_panel_3,
+.admin_left_vertical_panel_4{
+	margin-top:5px;
+	margin-bottom:2px;
+	border: 1px solid lightgrey;
+	padding-left: 10px;
+	padding-top: 10px;
+	font-size: 20px;
+	height:50px;
+	width:100%;
+}
+
+.orders_body{
+	margin-top:10px;
+	float: right;
+	border-top: 1px solid lightgrey;
+	border-bottom: 1px solid lightgrey;
+	width:75%
+}
+
+.volunteer_body{
+	display: none;
+	margin-top:20px;
+	float: right;
+	border-top: 1px solid lightgrey;
+	border-bottom: 1px solid lightgrey;
+	width:75%
+}
+
+.contact_body{
+	display: none;
+	margin-top:20px;
+	float: right;
+	border-top: 1px solid lightgrey;
+	border-bottom: 1px solid lightgrey;
+	width:75%
+}
+
+.product_switch_btn{
+	margin-top: 6px;
+	margin-left:8px;
+	margin-bottom:8px;
+	width:90px;
+	height: 35px;
+	background-color:#009c00;
+	color: white;
+	border: 0;
+}
+
+.product_body{
+	padding-left:4px;
+	display: none;
+	margin-top:10px;
+	float: right;
+	border: 1px solid grey;
+	width:75%
+}
+.add_product_form{
+	padding-left:20px;
+	border: 1px solid grey;
+	width:60%;
+	height:400px;
+	margin-top:2%;
+	margin-left:20%;
+	margin-bottom:3%;
+}
+#product_body_ip_4{
+		/* height:50px; */
+	/* width:80%; */
+}
+
+
+.remove_product_form{
+	display: none;
+}
+.remove_product_form_list{
+	height:70px;
+	width:100%;
+}
+
+
+#remove_product_form_list_img{
+	float: left;
+	height:49px;
+	width:60px;
+}
+#remove_product_form_list_table{
+	table-layout: fixed;
+	margin-top:5px;
+	border:1px solid grey;
+	border-right: 0;
+	float: left;
+	text-align: center;
+}
+#remove_product_form_list_table td{
+	border-right:1px solid grey;
+	width:165px;
+	overflow: hidden;
+}
+
+/* Contacu_us */
+
+.common_list{
+	width: 100%;
+	margin-top:10px;
+}
+
+.common_list table{
+	border:1px solid grey;
+	border-right:0;
+	table-layout: fixed;
+}
+
+.common_list td{
+	text-align: center;
+	border-right:1px solid grey;
+	width:250px;
+}

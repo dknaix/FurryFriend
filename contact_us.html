@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="ff.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			fetch_contact_us= () => {
+				let a=$("#contact_us_ip_1").val()
+				let b=$("#contact_us_ip_2").val()
+				let c=$("#contact_us_ip_3").val()
+
+				$.post("validate.php",{contact_us_1:a, contact_us_2:b, contact_us_3:c},
+					function(data, status){
+						alert(data)
+					}
+				);
+			}
+		</script>
+	</head>
+	<body>
+		<div class="contact_us_conatiner">
+			<label id="contact_us_conatiner">Contact us</label>
+			<br><br>Name here
+			<br><input id="contact_us_ip_1"></input>
+			<br><br>Email
+			<br><input id="contact_us_ip_2"></input>
+			<br><br>Your Message
+			<br><textarea id="contact_us_ip_3" rows="5" cols="40"></textarea>
+			<br><br><button id="contact_us_submit_btn" class="submit_btn_theme" onclick="fetch_contact_us()">Submit</button>
+		</div>
+	</body>
+</html>
