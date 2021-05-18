@@ -9,7 +9,7 @@ Prequisites:
 
 How to Start server:
 1. Place these files on the server root dir
-2. run "sql_server_FF.pyc" file eg.>> python sql_server_FF.pyc
+2. run "sql_server_FF.cpython-38.pyc" file eg.>> python sql_server_FF.cpython-38.pyc
 3. In Browser address bar go to >> localhost/FurryFriend/ff_main.html
 And done !!!
 
